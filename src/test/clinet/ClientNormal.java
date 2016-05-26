@@ -5,7 +5,8 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.net.InetSocketAddress;  
+import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.net.SocketAddress;  
 import java.util.Properties;  
   
@@ -17,35 +18,37 @@ import test.server.Configuration;
 import test.server.MyHandshakeCompletedListener;  
 import test.server.SocketIO;  
   
-public class Client {  
+public class ClientNormal {  
     private SSLContext sslContext;  
 //    private int serverPort = 10001;//  
 //    private String serverAddress ="127.0.0.1";  
     
     private int serverPort =  5060;//10001;//  
-    private String serverAddress ="21313";// "127.0.0.1";  //
+    private String serverAddress ="192.168.41.86";// "127.0.0.1";  //
     
-    private SSLSocket socket;  
+    private Socket socket;  
     private Properties p;  
       
-    public Client(){  
+    public ClientNormal(){  
         try {  
             p = Configuration.getConfig();  
               
-            sslContext = Auth2.getSSLContext();  
-            SSLSocketFactory factory = (SSLSocketFactory) sslContext.getSocketFactory();    
-            socket = (SSLSocket)factory.createSocket();   
-            String[] pwdsuits = socket.getSupportedCipherSuites();  
-            //socket可以使用所有支持的加密套件  
-            socket.setEnabledCipherSuites(pwdsuits);  
-            //默认就是true  
-            socket.setUseClientMode(true);  
-              
-            SocketAddress address = new InetSocketAddress(serverAddress, serverPort);  
-            socket.connect(address, 0);  
-              
-            MyHandshakeCompletedListener listener = new MyHandshakeCompletedListener();  
-            socket.addHandshakeCompletedListener(listener);  
+//            sslContext = Auth2.getSSLContext();  
+//            SSLSocketFactory factory = (SSLSocketFactory) sslContext.getSocketFactory();    
+//            socket = (SSLSocket)factory.createSocket();   
+//            String[] pwdsuits = socket.getSupportedCipherSuites();  
+//            //socket可以使用所有支持的加密套件  
+//            socket.setEnabledCipherSuites(pwdsuits);  
+//            //默认就是true  
+//            socket.setUseClientMode(true);  
+//              
+//            SocketAddress address = new InetSocketAddress(serverAddress, serverPort);  
+//            socket.connect(address, 0);  
+//              
+//            MyHandshakeCompletedListener listener = new MyHandshakeCompletedListener();  
+//            socket.addHandshakeCompletedListener(listener);  
+            
+            socket = new Socket(serverAddress,serverPort);
         } catch (Exception e) {  
             e.printStackTrace();  
             System.out.println("socket establish failed!");  
@@ -61,13 +64,13 @@ public class Client {
             byte[] bytes = user.getBytes();//.getBytes(encoding);  
             int length =128;  
             int pwd = 123;  
-            String name = "111111";
+            String name = "1000";
             
             String address = socket.getLocalAddress().toString().substring(1);
 			int port = socket.getLocalPort();
 			
             PrintWriter pw = new PrintWriter(new OutputStreamWriter(output));
-			pw.println("REGISTER sip:" + serverAddress + ":5061 SIP/2.0");
+			pw.println("REGISTER sip:" + serverAddress + ":5060 SIP/2.0");
 			pw.println("Via: SIP/2.0/TLS " + address + ":" + port + ";alias;branch=z9hG4bK.hYKNAg7r7;rport");
 			pw.println("From: <sip:" + name + "@" + serverAddress + ">;tag=uXpl3xe1G");
 			pw.println("To: sip:" + name + "@" + serverAddress);
@@ -106,7 +109,7 @@ public class Client {
     }  
       
     public static void main(String[] args){  
-        Client client = new Client();  
+        ClientNormal client = new ClientNormal();  
         client.request();  
     }  
 }  
